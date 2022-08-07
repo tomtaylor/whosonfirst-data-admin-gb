@@ -1,0 +1,22 @@
+name: Validate files
+on: 
+  pull_request:
+  push:
+  workflow_dispatch:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install wof-format
+        uses: supplypike/setup-bin@v1
+        with:
+          uri: 'https://github.com/whosonfirst/go-whosonfirst-format/releases/download/v0.4.1/wof-format_0.4.1_Linux_x86_64'
+          name: 'wof-format'
+          version: '0.4.1'
+
+      - name: Runs wof-format check
+        run: |
+          find ./data -name "*.geojson" -print0 | xargs -n1 -0 -I {} sh -c 'wof-format -check $1 || exit 255' sh {}
